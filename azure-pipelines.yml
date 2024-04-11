@@ -1,0 +1,56 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger: none
+
+#trigger:
+#- main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  bkresourcegroups: 'terraformstate'
+  bkstorageaccount: 'tstateaztreinamento'
+  bkcontainer: 'terraformstate'
+  bkkey: 'bastion.terraform.tfstate'
+
+stages:
+  - stage: 
+    jobs:
+      - job: validate
+        continueOnError: false
+        steps:
+        
+          - task: TerraformInstaller@1
+            displayName: Instalar o Terraform
+            inputs:
+              terraformVersion: 'latest'
+
+          - task: TerraformTaskV4@4
+            displayName: Iniciar o Terraform
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceArm: 'TerraFormDevConnection'
+              backendAzureRmResourceGroupName: '$(bkresourcegroups)'
+              backendAzureRmStorageAccountName: '$(bkstorageaccount)'
+              backendAzureRmContainerName: '$(bkcontainer)'
+              backendAzureRmKey: '$(bkkey)'
+              
+          - task: TerraformTaskV4@4
+            displayName: Planejar a codificação no Terraform
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              environmentServiceNameAzureRM: 'TerraFormDevConnection'
+              
+          - task: TerraformTaskV4@4
+            displayName: Applicar a codificação no Terraform
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              commandOptions: '-auto-approve'
+              environmentServiceNameAzureRM: 'TerraFormDevConnection'
