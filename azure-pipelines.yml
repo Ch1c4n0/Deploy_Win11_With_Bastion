@@ -12,10 +12,10 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  bkresourcegroups: 'terraformstate'
-  bkstorageaccount: 'tstateaztreinamento'
-  bkcontainer: 'terraformstate'
-  bkkey: 'bastion.terraform.tfstate'
+  bkresourcegroups: ''
+  bkstorageaccount: ''
+  bkcontainer: ''
+  bkkey: ''
 
 stages:
   - stage: 
